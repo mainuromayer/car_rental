@@ -22,6 +22,11 @@ class VerifyEmailController extends Controller
             event(new Verified($request->user()));
         }
 
-        return redirect()->intended(route('dashboard', absolute: false).'?verified=1');
+        if(Auth::user()->isAdmin()) {
+            return redirect()->intended(route('admin.dashboard', absolute: false).'?verified=1');
+        } else if(Auth::user()->isCustomer()) {
+            return redirect()->intended(route('customer.dashboard', absolute: false).'?verified=1');
+        }
+        // return redirect()->intended(route('dashboard', absolute: false).'?verified=1');
     }
 }

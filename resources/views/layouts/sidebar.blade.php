@@ -16,7 +16,7 @@
         @if (Auth::user()->isAdmin())
 
             <div class="py-2.5 px-4">
-                <x-nav-link :href="route('dashboard')" :active="request()->is('dashboard') || request()->is('admin/dashboard')">
+                <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                     {{ __('Dashboard') }}
                 </x-nav-link>
             </div>
@@ -42,22 +42,22 @@
         @elseif (Auth::user()->isCustomer())
 
         <div class="py-2.5 px-4">
-            <x-nav-link :href="route('customer.dashboard')" :active="request()->is('dashboard')">
+            <x-nav-link :href="route('customer.dashboard')" :active="request()->routeIs('customer.dashboard')">
                 {{ __('Dashboard') }}
             </x-nav-link>
         </div>
 
-        <div class="py-2.5 px-4">
-            <x-nav-link :href="route('customer.admin.rental.list')" :active="request()->is('customer/rental/*') || request()->is('rental')">
+        {{-- <div class="py-2.5 px-4">
+            <x-nav-link :href="route('admin.car.list')" :active="request()->is('admin/car/*') || request()->is('admin/car')">
                 {{ __('Rental') }}
             </x-nav-link>
         </div>
 
         <div class="py-2.5 px-4">
-            <x-nav-link :href="route('customer.admin.rental.list')" :active="request()->is('customer/rental/*') || request()->is('rental')">
+            <x-nav-link :href="route('admin.rental.list')" :active="request()->is('admin/rental/*') || request()->is('admin/rental')">
                 {{ __('Rental History') }}
             </x-nav-link>
-        </div>
+        </div> --}}
 
         @endif
 

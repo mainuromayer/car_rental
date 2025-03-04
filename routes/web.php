@@ -15,7 +15,7 @@ Route::get('/contact', [PageController::class, 'contactPage'])->name('contact');
 
 
 Route::middleware(['auth', 'verified', 'isAdmin'])->prefix('admin')->group(function () {
-    Route::get('dashboard', [PageController::class, 'dashboard'])->name('dashboard');
+    Route::get('dashboard', [PageController::class, 'adminDashboard'])->name('admin.dashboard');
 
     Route::prefix('car')->group(function () {
         Route::get('/', [CarController::class, 'list'])->name('admin.car.list');
@@ -43,6 +43,31 @@ Route::middleware(['auth', 'verified', 'isAdmin'])->prefix('admin')->group(funct
         Route::get('/details/{id}', [CustomerController::class, 'details'])->name('admin.customer.details');
         Route::delete('/delete/{id}', [CustomerController::class, 'delete'])->name('admin.customer.delete');
     });
+
+
+});
+
+Route::middleware(['auth', 'verified', 'isCustomer'])->prefix('customer')->group(function () {
+    Route::get('dashboard', [PageController::class, 'customerDashboard'])->name('customer.dashboard');
+
+    // Route::prefix('car')->group(function () {
+    //     Route::get('/', [CarController::class, 'list'])->name('customer.car.list');
+    //     Route::get('/create', [CarController::class, 'create'])->name('customer.car.create');
+    //     Route::post('/store', [CarController::class, 'store'])->name('customer.car.store');
+    //     Route::get('/edit/{id}', [CarController::class, 'edit'])->name('customer.car.edit');
+    //     Route::get('/details/{id}', [CarController::class, 'details'])->name('customer.car.details');
+    //     Route::delete('/delete/{id}', [CarController::class, 'delete'])->name('customer.car.delete');
+    // });
+    
+    // Route::prefix('rental')->group(function () {
+    //     Route::get('/', [RentalController::class, 'list'])->name('customer.rental.list');
+    //     Route::get('/create', [RentalController::class, 'create'])->name('customer.rental.create');
+    //     Route::post('/store', [RentalController::class, 'store'])->name('customer.rental.store');
+    //     Route::get('/edit/{id}', [RentalController::class, 'edit'])->name('customer.rental.edit');
+    //     Route::get('/details/{id}', [RentalController::class, 'details'])->name('customer.rental.details');
+    //     Route::delete('/delete/{id}', [RentalController::class, 'delete'])->name('customer.rental.delete');
+    // });
+
 
 
 });

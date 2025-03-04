@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CustomerAuthMiddleware
 {
-    public function handle(Request $request, Closure $next, $role): Response
+    public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check() && Auth::user()->isCustomer()) {
             return $next($request);

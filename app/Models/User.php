@@ -34,7 +34,7 @@ class User extends Authenticatable
      */
     public function isAdmin()
     {
-        return $this->role === 'admin';
+        return $this->role === "admin";
     }
 
     /**
@@ -44,7 +44,7 @@ class User extends Authenticatable
      */
     public function isCustomer()
     {
-        return $this->role === 'customer';
+        return $this->role === "customer";
     }
 
     /**

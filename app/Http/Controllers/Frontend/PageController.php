@@ -52,12 +52,19 @@ class PageController extends Controller
     }
 
 
-    public function dashboard(){
+    public function adminDashboard(){
         $total_cars = Car::all()->count();
         $available_cars = Car::with('rentals')->where('availability', '1')->get()->count();
         $total_rentals = Rental::where('status', 'completed')->count();
         $total_earnings = Rental::where('status', 'completed')->sum('total_cost');
         return view('backend.admin.dashboard', compact('total_cars', 'available_cars', 'total_rentals', 'total_earnings'));
+    }
+
+    public function customerDashboard(){
+        $total_cars = Car::all()->count();
+        $available_cars = Car::with('rentals')->where('availability', '1')->get()->count();
+        $total_rentals = Rental::where('status', 'completed')->count();
+        return view('backend.customer.dashboard', compact('total_cars', 'available_cars', 'total_rentals'));
     }
     
 

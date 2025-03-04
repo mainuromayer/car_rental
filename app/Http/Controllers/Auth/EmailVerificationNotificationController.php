@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
 
 class EmailVerificationNotificationController extends Controller
 {
@@ -14,7 +15,11 @@ class EmailVerificationNotificationController extends Controller
     public function store(Request $request): RedirectResponse
     {
         if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->intended(route('dashboard', absolute: false));
+            if(Auth::user()->isAdmin()) {
+                return redirect()->intended(route('admin.dashboard', absolute: false));
+            } else if(Auth::user()->isCustomer()) {
+                return redirect()->intended(route('customer.dashboard', absolute: false));
+            }
         }
 
         $request->user()->sendEmailVerificationNotification();
