@@ -11,7 +11,7 @@ class CarController extends Controller
 {
 
     public function create(){
-        return view('backend.car.create');
+        return view('backend.admin.car.create');
     }
 
 
@@ -62,17 +62,17 @@ class CarController extends Controller
             $message = 'Car created successfully';
         }
     
-            return redirect()->route('car.list')->with('status', 'success')->with('message', $message);
+            return redirect()->route('admin.car.list')->with('status', 'success')->with('message', $message);
         } catch (Exception $e) {
-            return redirect()->route('car.list')->with('status', 'error')->with('message', 'Operation failed: ' . $e->getMessage());
+            return redirect()->route('admin.car.list')->with('status', 'error')->with('message', 'Operation failed: ' . $e->getMessage());
         }
     }
     
 
     public function list(Request $request){
         try{
-            $cars = Car::paginate(5);
-            return view('backend.car.list', compact('cars'));
+            $cars = Car::orderBy('id', 'desc')->paginate(5);
+            return view('backend.admin.car.list', compact('cars'));
         } catch(Exception $e){
             return response()->json([
                 'status' => 'failed',
@@ -83,16 +83,26 @@ class CarController extends Controller
 
     public function details($id){
         $car = Car::find($id);
-        return view('backend.car.details', compact('car'));
+        return view('backend.admin.car.details', compact('car'));
     }
 
-    public function delete(Request $request){
-        $car_id = $request->input('id');
-        return Car::where('id', $car_id)->delete();
+    public function delete($id){
+        try{
+            $car = Car::find($id);
+            $car->delete();
+            return redirect()->route('admin.car.list')->with('status', 'success')->with('message', 'Car deleted successfully!');
+
+        } catch(Exception $e){
+            return response()->json([
+                'status' => 'failed',
+                'error' => $e->getMessage()
+            ], 400);
+        }
+
     }
 
-    public function edit(Request $request, $id){
+    public function edit($id){
         $car = Car::findOrFail($id);
-        return view('backend.car.edit', compact('car'));
+        return view('backend.admin.car.edit', compact('car'));
     }
 }

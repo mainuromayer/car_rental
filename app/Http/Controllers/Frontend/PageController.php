@@ -3,23 +3,48 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Models\Car;
+use App\Models\Rental;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class PageController extends Controller
 {
     public function homePage () {
-        return view('frontend.home');
+        $cars = Car::with('rentals')->where('availability', '1')->get();
+        return view('frontend.home', compact('cars'));
     }
     public function aboutPage () {
         return view('frontend.about');
     }
-    public function rentalPage () {
-        return view('frontend.rentals');
+    public function rentalPage (Request $request) {
+        $brand = $request->query('brand');
+        $model = $request->query('model');
+        $max_rent_price = $request->query('max_rent_price');
+
+        $cars = Car::with('rentals')->where('availability', '1');
+
+        if($brand){
+            $cars->where('brand', $brand);
+        }
+
+        if($model){
+            $cars->where('model', $model);
+        }
+
+        if($max_rent_price){
+            $cars->where('daily_rent_price','<=', $max_rent_price);
+        }
+
+        $cars = $cars->get();
+        $brands = Car::distinct()->pluck('brand');
+        $models = Car::distinct()->pluck('model');
+
+        return view('frontend.rentals', compact('cars', 'brands', 'models'));
     }
 
     public function carDetailsPage ($id) {
-        return view('frontend.car', ['id' => $id]);
+        $car = Car::with('rentals')->findOrFail($id);
+        return view('frontend.car', ['id' => $id], compact('car'));
     }
 
     public function contactPage () {
@@ -28,19 +53,13 @@ class PageController extends Controller
 
 
     public function dashboard(){
-        return view('backend.dashboard');
+        $total_cars = Car::all()->count();
+        $available_cars = Car::with('rentals')->where('availability', '1')->get()->count();
+        $total_rentals = Rental::where('status', 'completed')->count();
+        $total_earnings = Rental::where('status', 'completed')->sum('total_cost');
+        return view('backend.admin.dashboard', compact('total_cars', 'available_cars', 'total_rentals', 'total_earnings'));
     }
-    public function customerIndex(){
-        return view('backend.customer.index');
-    }
-    public function customerForm(){
-        return view('backend.customer.form');
-    }
-    public function rentalIndex(){
-        return view('backend.rental.index');
-    }
-    public function rentalForm(){
-        return view('backend.rental.form');
-    }
+    
+
 
 }

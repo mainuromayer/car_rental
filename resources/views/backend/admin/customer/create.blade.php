@@ -10,30 +10,30 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
 
-                    <form method="POST" action="{{-- {{ route('car.store') }} --}}" enctype="multipart/form-data">
+                    <form method="POST" action="{{ route('admin.customer.store') }}" enctype="multipart/form-data">
                         @csrf
                         <div class="grid grid-cols-1 gap-6">
                             <div>
                                 <x-input-label for="name" :value="__('Customer Name')" />
-                                <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" autocomplete="name" />
+                                <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" autocomplete="name" />
                                 <x-input-error :messages="$errors->get('name')" class="mt-2" />
                             </div>
 
                             <div>
                                 <x-input-label for="email" :value="__('Customer Email')" />
-                                <x-text-input id="email" name="email" type="text" class="mt-1 block w-full" autocomplete="email" />
+                                <x-text-input id="email" name="email" type="text" class="mt-1 block w-full" :value="old('email')" autocomplete="email" />
                                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
                             </div>
 
                             <div>
                                 <x-input-label for="phone" :value="__('Phone Number')" />
-                                <x-text-input id="phone" name="phone" type="number" class="mt-1 block w-full" autocomplete="phone" />
+                                <x-text-input id="phone" name="phone" type="number" class="mt-1 block w-full" :value="old('phone')" autocomplete="phone" />
                                 <x-input-error :messages="$errors->get('phone')" class="mt-2" />
                             </div>
 
                             <div>
                                 <x-input-label for="address" :value="__('Address')" />
-                                <x-text-input id="address" name="address" type="text" class="mt-1 block w-full" autocomplete="address" />
+                                <x-text-input id="address" name="address" type="text" class="mt-1 block w-full" :value="old(key: 'address')" autocomplete="address" />
                                 <x-input-error :messages="$errors->get('address')" class="mt-2" />
                             </div>
                             
