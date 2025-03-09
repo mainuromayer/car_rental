@@ -95,7 +95,7 @@
                     {{ __('Car') }}
                 </x-responsive-nav-link>
 
-                <x-responsive-nav-link :href="route('admin.rental.list')" :active="request()->is('admin/rental/*') || request()->is('admin/rental')">
+                <x-responsive-nav-link :href="route('rental.list')" :active="request()->is('admin/rental/*') || request()->is('admin/rental')">
                     {{ __('Rental') }}
                 </x-responsive-nav-link>
             @elseif (Auth::user()->isCustomer())
@@ -105,17 +105,18 @@
                     </x-nav-link>
                 </div>
 
-                {{-- <div class="py-2.5 px-4">
-            <x-nav-link :href="route('admin.car.list')" :active="request()->is('admin/car/*') || request()->is('admin/car')">
-                {{ __('Rental') }}
-            </x-nav-link>
-        </div>
+                <div class="py-2.5 px-4">
+                    <x-nav-link :href="route('customer.rental.list')" :active="request()->routeIs('customer.rental.list')">
+                        {{ __('Rental') }}
+                    </x-nav-link>
+                </div>
+        
+                <div class="py-2.5 px-4">
+                    <x-nav-link :href="route('customer.rental_history.list')" :active="request()->routeIs('customer.rental_history.list')">
+                        {{ __('Rental History') }}
+                    </x-nav-link>
+                </div>
 
-        <div class="py-2.5 px-4">
-            <x-nav-link :href="route('admin.rental.list')" :active="request()->is('admin/rental/*') || request()->is('admin/rental')">
-                {{ __('Rental History') }}
-            </x-nav-link>
-        </div> --}}
             @endif
         </div>
 

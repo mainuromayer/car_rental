@@ -5,8 +5,8 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="">
+        <div class="max-w-7xl mx-auto">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     <div class="my-2">
@@ -22,7 +22,7 @@
                     </div>
 
                     <div class="flex justify-between items-center mb-4">
-                        <form method="GET" action="{{ route('admin.customer.list') }}">
+                        {{-- <form method="GET" action="{{ route('admin.customer.list') }}">
                             <div class="flex items-center">
                                 <input type="text" name="search" placeholder="Search customers..."
                                     class="form-input rounded-md shadow-sm mt-1 block w-full"
@@ -32,9 +32,9 @@
                                     Search
                                 </button>
                             </div>
-                        </form>
+                        </form> --}}
                         <a href="{{ route('admin.customer.create') }}"
-                            class="ml-3 inline-flex items-center px-4 py-2 bg-green-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring ring-green-300 disabled:opacity-25 transition ease-in-out duration-150">
+                            class="ml-auto inline-flex items-center px-4 py-2 bg-green-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-900 focus:outline-none focus:border-green-900 focus:ring ring-green-300 disabled:opacity-25 transition ease-in-out duration-150">
                             Add Customer
                         </a>
                     </div>
@@ -83,7 +83,7 @@
                                         {{ $customer->phone }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ $customer->address }}
+                                        {{ Str::limit($customer->address, 5); }}
                                     </td>
                                     
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">

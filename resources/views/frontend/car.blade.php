@@ -18,7 +18,7 @@
                                 <li><strong>Type: </strong>{{ $car->car_type }}</li>
                                 <li><strong>Daily Rent: </strong> ৳<span>{{ $car->daily_rent_price }}</span></li>
                             </ul>
-                            <form action="{{ route('admin.rental.store') }}" method="post">
+                            <form action="{{ route('rental.store') }}" method="post">
                                 @csrf
                                 <input type="hidden" name="car_id" value="{{ $car->id }}">
                                 <input type="hidden" name="daily_rent_price" value="{{ $car->daily_rent_price }}">

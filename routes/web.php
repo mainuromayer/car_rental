@@ -26,14 +26,7 @@ Route::middleware(['auth', 'verified', 'isAdmin'])->prefix('admin')->group(funct
         Route::delete('/delete/{id}', [CarController::class, 'delete'])->name('admin.car.delete');
     });
     
-    Route::prefix('rental')->group(function () {
-        Route::get('/', [RentalController::class, 'list'])->name('admin.rental.list');
-        Route::get('/create', [RentalController::class, 'create'])->name('admin.rental.create');
-        Route::post('/store', [RentalController::class, 'store'])->name('admin.rental.store');
-        Route::get('/edit/{id}', [RentalController::class, 'edit'])->name('admin.rental.edit');
-        Route::get('/details/{id}', [RentalController::class, 'details'])->name('admin.rental.details');
-        Route::delete('/delete/{id}', [RentalController::class, 'delete'])->name('admin.rental.delete');
-    });
+
     
     Route::prefix('customer')->group(function () {
         Route::get('/', [CustomerController::class, 'list'])->name('admin.customer.list');
@@ -47,28 +40,25 @@ Route::middleware(['auth', 'verified', 'isAdmin'])->prefix('admin')->group(funct
 
 });
 
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::prefix('rental')->group(function () {
+        Route::get('/', [RentalController::class, 'list'])->name('rental.list');
+        Route::get('/create', [RentalController::class, 'create'])->name('rental.create');
+        Route::post('/store', [RentalController::class, 'store'])->name('rental.store');
+        Route::get('/edit/{id}', [RentalController::class, 'edit'])->name('rental.edit');
+        Route::get('/details/{id}', [RentalController::class, 'details'])->name('rental.details');
+        Route::delete('/delete/{id}', [RentalController::class, 'delete'])->name('rental.delete');
+    });
+});
+
 Route::middleware(['auth', 'verified', 'isCustomer'])->prefix('customer')->group(function () {
     Route::get('dashboard', [PageController::class, 'customerDashboard'])->name('customer.dashboard');
-
-    // Route::prefix('car')->group(function () {
-    //     Route::get('/', [CarController::class, 'list'])->name('customer.car.list');
-    //     Route::get('/create', [CarController::class, 'create'])->name('customer.car.create');
-    //     Route::post('/store', [CarController::class, 'store'])->name('customer.car.store');
-    //     Route::get('/edit/{id}', [CarController::class, 'edit'])->name('customer.car.edit');
-    //     Route::get('/details/{id}', [CarController::class, 'details'])->name('customer.car.details');
-    //     Route::delete('/delete/{id}', [CarController::class, 'delete'])->name('customer.car.delete');
-    // });
     
-    // Route::prefix('rental')->group(function () {
-    //     Route::get('/', [RentalController::class, 'list'])->name('customer.rental.list');
-    //     Route::get('/create', [RentalController::class, 'create'])->name('customer.rental.create');
-    //     Route::post('/store', [RentalController::class, 'store'])->name('customer.rental.store');
-    //     Route::get('/edit/{id}', [RentalController::class, 'edit'])->name('customer.rental.edit');
-    //     Route::get('/details/{id}', [RentalController::class, 'details'])->name('customer.rental.details');
-    //     Route::delete('/delete/{id}', [RentalController::class, 'delete'])->name('customer.rental.delete');
-    // });
-
-
+    Route::prefix('rental')->group(function () {
+        Route::get('/', [RentalController::class, 'customerRentallist'])->name('customer.rental.list');
+        Route::get('/history', [RentalController::class, 'customerRentalHistorylist'])->name('customer.rental_history.list');
+        Route::delete('/delete/{id}', [RentalController::class, 'customerRentalDelete'])->name('customer.rental.delete');
+    });
 
 });
 
