@@ -1,11 +1,15 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+use App\Models\User;
+use App\Models\Rental;
+use App\Mail\RentalConfirmMail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\CarController;
 use App\Http\Controllers\Admin\RentalController;
-use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Frontend\PageController;
+use App\Http\Controllers\Admin\CustomerController;
 
 Route::get('/', [PageController::class, 'homePage'])->name('home');
 Route::get('/about', [PageController::class, 'aboutPage'])->name('about');
@@ -70,6 +74,17 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+
+Route::get('/test-email', function () {
+    Mail::raw('This is a test email', function ($message) {
+        $message->to('mainuromayer@gmail.com')->subject('Test Email');
+    });
+
+    return 'Email sent!';
+});
+
+
 
 
 

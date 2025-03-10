@@ -102,6 +102,7 @@ class CustomerController extends Controller
     public function edit($id)
     {
         $customer = User::where('role', 'customer')->findOrFail($id);
+        
         return view('backend.admin.customer.edit', compact('customer'));
     }
 }

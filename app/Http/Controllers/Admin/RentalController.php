@@ -8,8 +8,11 @@ use App\Models\Car;
 use App\Models\User;
 use App\Models\Rental;
 use Illuminate\Http\Request;
+use App\Mail\RentalConfirmMail;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class RentalController extends Controller
 {
@@ -23,14 +26,17 @@ class RentalController extends Controller
 
     public function store(Request $request)
     {
-
         try {
             $rental_id = $request->id;
             if ($rental_id) {
-                $rental = Rental::findOrFail($rental_id);
+                // Fetch existing rental with related user and car data
+                $rental = Rental::with('user', 'car')->findOrFail($rental_id);
             } else {
+                // Create a new rental object if no ID is provided
                 $rental = new Rental();
             }
+    
+            // Validate the incoming request data
             $request->validate([
                 'user_id' => 'required|exists:users,id',
                 'car_id' => 'required|exists:cars,id',
@@ -38,32 +44,44 @@ class RentalController extends Controller
                 'end_date' => 'required|date|after_or_equal:start_date',
                 'status' => 'required|string|in:pending,ongoing,completed,canceled',
             ]);
-
+    
+            // Parse start and end dates
             $start_date = Carbon::parse($request->input('start_date'));
             $end_date = Carbon::parse($request->input('end_date'));
-
-            $existingRental = Rental::where('car_id', $request->input('car_id'))
+    
+            // Adjust the overlap check for admin updates
+            $existingRentalQuery = Rental::where('car_id', $request->input('car_id'))
                 ->where(function ($query) use ($start_date, $end_date) {
                     $query->whereBetween('start_date', [$start_date, $end_date])
-                        ->orWhereBetween('end_date', [$start_date, $end_date])
-                        ->orWhere(function ($query) use ($start_date, $end_date) {
-                            $query->where('start_date', '<=', $start_date)->where('end_date', '>=', $end_date);
-                        });
-                })->exists();
-            // dd($existingRental);
-
-            if ($existingRental) {
-                return redirect()->route('rental.list')->with('status', 'error')->with('message', 'The car is already booked for the selected dates.');
+                          ->orWhereBetween('end_date', [$start_date, $end_date])
+                          ->orWhere(function ($query) use ($start_date, $end_date) {
+                              $query->where('start_date', '<=', $start_date)->where('end_date', '>=', $end_date);
+                          });
+                });
+    
+            // Exclude the current rental if we are updating it
+            if ($rental_id) {
+                $existingRentalQuery->where('id', '!=', $rental_id);
             }
-
-
+    
+            // If another rental exists for the same car and dates, return an error
+            $existingRental = $existingRentalQuery->exists();
+    
+            if ($existingRental) {
+                if (Auth::user()->isAdmin()) {
+                    return redirect()->route('rental.list')->with('status', 'error')->with('message', 'The car is already booked for the selected dates.');
+                } elseif (Auth::user()->isCustomer()) {
+                    return redirect()->route('customer.rental.list')->with('status', 'error')->with('message', 'The car is already booked for the selected dates.');
+                }
+            }
+    
+            // Calculate the rental total cost
             $total_days = floatval(abs($end_date->diffInDays($start_date)));
             $car = Car::findOrFail($request->input('car_id'));
             $rental_cost = $car->daily_rent_price;
-
-
             $total_cost = $rental_cost * $total_days;
-
+    
+            // Prepare the rental data for storing
             $rentalData = [
                 'user_id' => $request->input('user_id'),
                 'car_id' => $request->input('car_id'),
@@ -72,22 +90,42 @@ class RentalController extends Controller
                 'total_cost' => $total_cost,
                 'status' => $request->input('status'),
             ];
-
-
-
-            if ($rental->exists) {
-                $rental->update($rentalData);
-                $message = 'Rental updated successfully';
-            } else {
-                $rental->create($rentalData);
-                $message = 'Rental created successfully';
-            }
-
-            return redirect()->route('rental.list')->with('status', 'success')->with('message', $message);
+    
+            // Fetch the user and car for the email
+            $user = User::findOrFail($rentalData['user_id']);
+            $car = Car::findOrFail($rentalData['car_id']);
+            $user_email = $user->email;
+            $user_name = $user->name;
+            $car_name = $car->name;
+            $car_brand = $car->brand;
+    
+            // Save the rental data
+            $rental->fill($rentalData);
+            $rental->save();
+    
+            // Send email to customer
+            Mail::to($user_email)->send(new RentalConfirmMail($rental, $user_name, $car_name, $car_brand));
+    
+            // Send email to admin
+            $adminEmail = 'mainuromayer@gmail.com';
+            Mail::to($adminEmail)->send(new RentalConfirmMail($rental, $user_name, $car_name, $car_brand));
+    
+            // Set the success message based on whether the rental was created or updated
+            $message = $rental->exists ? 'Rental updated successfully' : 'Rental created successfully';
+    
+            return redirect()->route(Auth::user()->isAdmin() ? 'rental.list' : 'customer.rental.list')
+                             ->with('status', 'success')
+                             ->with('message', $message);
         } catch (Exception $e) {
-            return redirect()->route('rental.list')->with('status', 'error')->with('message', 'Operation failed: ' . $e->getMessage());
+            return redirect()->route(Auth::user()->isAdmin() ? 'rental.list' : 'customer.rental.list')
+                             ->with('status', 'error')
+                             ->with('message', 'Operation failed: ' . $e->getMessage());
         }
     }
+    
+    
+    
+    
 
 
     public function list(Request $request)

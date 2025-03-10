@@ -32,7 +32,7 @@
                                         Year: {{ $car->year }}
                                     </span>
                                 </p>
-                                <p>Daily Rent: $<span>{{ $car->daily_rent_price }}</span></p>
+                                <p>Daily Rent: ৳<span>{{ $car->daily_rent_price }}</span></p>
                                 <a href="{{ route('car_details', ['id' => $car->id]) }}" class="btn btn-dark">Rent Now</a>
                             </div>
                         </div>
