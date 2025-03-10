@@ -30,8 +30,6 @@ Route::middleware(['auth', 'verified', 'isAdmin'])->prefix('admin')->group(funct
         Route::delete('/delete/{id}', [CarController::class, 'delete'])->name('admin.car.delete');
     });
     
-
-    
     Route::prefix('customer')->group(function () {
         Route::get('/', [CustomerController::class, 'list'])->name('admin.customer.list');
         Route::get('/create', [CustomerController::class, 'create'])->name('admin.customer.create');

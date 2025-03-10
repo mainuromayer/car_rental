@@ -6,6 +6,7 @@ use Exception;
 use App\Models\User;
 use App\Models\Rental;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 
@@ -22,44 +23,72 @@ class CustomerController extends Controller
     {
         try {
             $customer_id = $request->id;
+            
             if ($customer_id) {
                 $customer = User::where('role', 'customer')->findOrFail($customer_id);
             } else {
                 $customer = new User();
-
             }
-            $request->validate([
-                'name' => 'required|string',
-                'email' => 'required|string|email|unique:users,email,' . $request->id,
-                'phone' => 'required|string',
-                'address' => 'nullable|string',
-                'password' => 'nullable|string|min:8',
-
-            ]);
-
+    
+            $validationRules = [
+                'name' => ['required', 'string', 'max:255'],
+                'phone' => ['required', 'string', 'max:255'],
+                'address' => ['required', 'string', 'max:255'],
+            ];
+    
+            if (!$customer->exists) {
+                $validationRules['email'] = [
+                    'required',
+                    'string',
+                    'lowercase',
+                    'email',
+                    'max:255',
+                    Rule::unique(User::class),
+                ];
+                $validationRules['password'] = 'required|string|min:8';
+            } else {
+                $validationRules['email'] = [
+                    'nullable',
+                    'string',
+                    'lowercase',
+                    'email',
+                    'max:255',
+                    Rule::unique(User::class)->ignore($customer->id),
+                ];
+            }
+    
+            $request->validate($validationRules);
+    
             $customerData = [
-                'name' => $request->input('name'),
-                'email' => $request->input('email'),
-                'phone' => $request->input('phone'),
-                'address' => $request->input('address'),
-                'password' => Hash::make($request->input('password')),
+                'name' => $request->input('name', $customer->name),
+                'email' => $request->input('email', $customer->email),
+                'phone' => $request->input('phone', $customer->phone),
+                'address' => $request->input('address', $customer->address),
                 'role' => 'customer',
             ];
-
-
+    
+            if (!$customer->exists && $request->input('password')) {
+                $customerData['password'] = Hash::make($request->input('password'));
+            } elseif ($customer->exists && $request->input('password')) {
+                $customerData['password'] = Hash::make($request->input('password'));
+            } else {
+                $customerData['password'] = $customer->password;
+            }
+    
             if ($customer->exists) {
                 $customer->update($customerData);
-                $message = 'Car updated successfully';
+                $message = 'Customer updated successfully';
             } else {
                 $customer->create($customerData);
                 $message = 'Customer created successfully';
             }
-
+    
             return redirect()->route('admin.customer.list')->with('status', 'success')->with('message', $message);
         } catch (Exception $e) {
             return redirect()->route('admin.customer.list')->with('status', 'error')->with('message', 'Operation failed: ' . $e->getMessage());
         }
     }
+    
 
 
     public function list(Request $request)
